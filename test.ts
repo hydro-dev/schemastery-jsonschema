@@ -45,8 +45,8 @@ describe('test', () => {
         // FIXME this should pass validation
         // test(Schema.string().default('foo'), undefined);
 
-        test(Schema.string().pattern('fo+', ''), 'foo');
-        test(Schema.string().pattern('fo+', ''), 'bar');
+        test(Schema.string().pattern(/fo+/), 'foo');
+        test(Schema.string().pattern(/fo+/), 'bar');
     });
 
     it('number', () => {
