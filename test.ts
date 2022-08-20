@@ -15,7 +15,7 @@ const test = (schema: AnySchema, value: any) => {
         convert: ${JSON.stringify(convert(schema, true))}
     `;
     try {
-        schema(value);
+        schema(value as never);
     } catch (e) {
         expect(check(schema, value), info).to.equal(false);
         return;
@@ -23,9 +23,7 @@ const test = (schema: AnySchema, value: any) => {
     expect(check(schema, value), info).to.equal(true);
 
     const extended = Schema.object({ foo: schema });
-
     const data = cloneDeep({ foo: value });
-    console.log(convert(extended, true));
     ajv.validate(convert(extended, true), data);
     const extendedinfo = `
         Schema: ${extended.toString()}
