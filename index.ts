@@ -3,7 +3,7 @@ import Schema from 'schemastery';
 
 type JSONSchema7 = Exclude<JSONSchema7Definition, boolean>;
 
-function getBaseSchema(def: Schema, allowUnsafe): JSONSchema7 {
+function getBaseSchema(def: Schema.Base, allowUnsafe): JSONSchema7 {
     switch (def.type) {
         case 'string':
             return {
@@ -50,7 +50,6 @@ function getBaseSchema(def: Schema, allowUnsafe): JSONSchema7 {
                 allOf: def.list?.map((inner) => ({ $ref: `#/definitions/${inner}` })),
             };
         default: {
-            console.log(def.toJSON());
             throw new Error('Not implemented');
         }
     }
@@ -65,10 +64,35 @@ function convertDef(def: Schema<any, any>, allowUnsafe = false): JSONSchema7 {
     return baseSchema;
 }
 
+function getAllRefs(def: Schema.Base) {
+    const refs = { ...def.refs };
+    if (def.list?.length) {
+        for (let i = 0; i < def.list.length; i++) {
+            if (typeof def.list[i] === 'number') continue;
+            Object.assign(refs, getAllRefs(def.list[i]));
+            def.list[i] = def.list[i].uid as any;
+        }
+    }
+    if (def.dict) {
+        for (const [key, inner] of Object.entries(def.dict)) {
+            if (typeof inner === 'number') continue;
+            Object.assign(refs, getAllRefs(inner));
+            def.dict[key] = inner.uid as any;
+        }
+    }
+    if (def.refs) {
+        Object.values(def.refs).forEach((node) => {
+            Object.assign(refs, getAllRefs(node))
+        })
+    }
+    return refs;
+}
+
 export default function convert(schema: Schema<any, any> | Schema<never, never>, allowUnsafe: boolean = false): JSONSchema7 {
-    const { uid = '0', refs = {} } = schema.toJSON();
-    const root = convertDef(refs[uid]!, allowUnsafe);
-    delete refs[uid];
+    const rootSchema = schema.toJSON();
+    const refs = getAllRefs(rootSchema);
+    const root = convertDef(refs[rootSchema.uid]!, allowUnsafe);
+    delete refs[rootSchema.uid];
     delete root.default; // ajv strict mode: default is ignored in the schema root
     const defs = {};
     for (const key in refs) defs[key] = convertDef(refs[key]!, allowUnsafe);

@@ -1,6 +1,6 @@
 {
   "name": "schemastery-jsonschema",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "index.js",
   "types": "index.d.ts",
   "author": "undefined <i@undefined.moe>",
@@ -20,7 +20,7 @@
     "@types/json-schema": "^7.0.11",
     "@types/lodash-es": "^4.17.6",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^18.7.8",
+    "@types/node": "^18.7.9",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",
     "ajv": "^8.11.0",

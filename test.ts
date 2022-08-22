@@ -2,7 +2,8 @@ import Ajv from 'ajv';
 import { expect } from 'chai';
 import { cloneDeep } from 'lodash-es';
 import Schema from 'schemastery';
-import convert from './index';
+// @ts-ignore
+import convert from './index.ts';
 
 const ajv = new Ajv({ useDefaults: true });
 type AnySchema = Schema | Schema<never, never>;
