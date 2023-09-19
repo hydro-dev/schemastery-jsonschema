@@ -3,7 +3,7 @@ import Schema from 'schemastery';
 
 type JSONSchema7 = Exclude<JSONSchema7Definition, boolean>;
 
-function getBaseSchema(def: Schema.Base, allowUnsafe): JSONSchema7 {
+function getBaseSchema(def: Schema, allowUnsafe): JSONSchema7 {
     switch (def.type) {
         case 'string':
             return {
@@ -64,7 +64,7 @@ function convertDef(def: Schema<any, any>, allowUnsafe = false): JSONSchema7 {
     return baseSchema;
 }
 
-function getAllRefs(def: Schema.Base) {
+function getAllRefs(def: Schema) {
     const refs = { ...def.refs };
     if (def.list?.length) {
         for (let i = 0; i < def.list.length; i++) {
@@ -82,8 +82,8 @@ function getAllRefs(def: Schema.Base) {
     }
     if (def.refs) {
         Object.values(def.refs).forEach((node) => {
-            Object.assign(refs, getAllRefs(node))
-        })
+            Object.assign(refs, getAllRefs(node));
+        });
     }
     return refs;
 }
