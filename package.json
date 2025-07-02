@@ -1,6 +1,6 @@
 {
   "name": "schemastery-jsonschema",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "index.js",
   "types": "index.d.ts",
   "author": "undefined <i@undefined.moe>",
@@ -12,21 +12,21 @@
   },
   "dependencies": {
     "json-schema": "^0.4.0",
-    "schemastery": "^3.13.0"
+    "schemastery": "^3.16.1"
   },
   "devDependencies": {
     "@hydrooj/eslint-config": "^1.0.4",
-    "@hydrooj/utils": "^1.4.14",
+    "@hydrooj/utils": "^1.4.35",
     "@types/chai": "^4.3.6",
-    "@types/json-schema": "^7.0.13",
-    "@types/lodash-es": "^4.17.9",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20.6.2",
-    "ajv": "^8.12.0",
-    "chai": "^4.3.8",
+    "@types/json-schema": "^7.0.15",
+    "@types/lodash-es": "^4.17.12",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.0.10",
+    "ajv": "^8.17.1",
+    "chai": "^5.2.0",
     "eslint": "^8.49.0",
     "lodash-es": "^4.17.21",
-    "mocha": "^10.2.0",
-    "typescript": "^5.2.2"
+    "mocha": "^11.7.1",
+    "typescript": "^5.8.3"
   }
 }

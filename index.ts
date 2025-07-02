@@ -4,54 +4,67 @@ import Schema from 'schemastery';
 type JSONSchema7 = Exclude<JSONSchema7Definition, boolean>;
 
 function getBaseSchema(def: Schema, allowUnsafe): JSONSchema7 {
+    const additional: JSONSchema7 = {};
+    if (def.meta?.badges?.find((i) => i.text === 'deprecated')) {
+        (additional as any).deprecated = true;
+    }
+    if (def.meta?.default) {
+        additional.default = def.meta.default;
+    }
+    if (def.meta?.description) {
+        additional.description = typeof def.meta.description === 'string' ? def.meta.description : Object.values(def.meta.description).join('\n');
+    }
     switch (def.type) {
         case 'string':
             return {
+                ...additional,
                 type: 'string',
                 pattern: def.meta?.pattern?.source,
             };
         case 'number':
             return {
+                ...additional,
                 type: 'number',
                 maximum: def.meta?.max,
                 minimum: def.meta?.min,
                 multipleOf: def.meta?.step,
             };
         case 'boolean':
-            return { type: 'boolean' };
+            return { ...additional, type: 'boolean' };
         case 'any':
-            return {};
+            return additional;
         case 'never':
-            return { type: 'boolean', const: 1 };
+            return { ...additional, type: 'boolean', const: 1 };
         case 'const':
-            return { const: def.value };
+            return { ...additional, const: def.value };
         case 'object':
             return {
+                ...additional,
                 type: 'object',
-                properties: Object.fromEntries(Object.entries(def.dict || {}).map((i) => [i[0], { $ref: `#/definitions/${i[1]}` }])),
+                properties: Object.fromEntries(Object.entries(def.dict || {}).map((i) => [i[0], { ...additional, $ref: `#/definitions/${i[1]}` }])),
             };
         case 'dict':
             if (!allowUnsafe) throw new Error('dict is unsafe, set allowUnsafe=true to ignore.');
             return {
+                ...additional,
                 type: 'object',
                 patternProperties: { '^.*$': { $ref: `#/definitions/${def.inner}` } },
                 additionalProperties: false,
             };
         case 'array':
             return {
+                ...additional,
                 type: 'array',
                 items: { $ref: `#/definitions/${def.inner}` },
             };
         case 'union':
-            return {
-                anyOf: def.list?.map((inner) => ({ $ref: `#/definitions/${inner}` })),
-            };
         case 'intersect':
             return {
-                allOf: def.list?.map((inner) => ({ $ref: `#/definitions/${inner}` })),
+                ...additional,
+                [def.type === 'intersect' ? 'allOf' : 'anyOf']: def.list?.map((inner) => ({ $ref: `#/definitions/${inner}` })),
             };
         case 'transform':
-            return { $ref: `#/definitions/${def.inner}` };
+            return { ...additional, $ref: `#/definitions/${def.inner}` };
         default: {
             throw new Error(`Not implemented: ${def.type}`);
         }
@@ -62,7 +75,7 @@ function convertDef(def: Schema<any, any>, allowUnsafe = false): JSONSchema7 {
     const baseSchema = getBaseSchema(def, allowUnsafe);
     baseSchema.default = def.meta?.default;
     if (!def.meta?.required) {
-        return { oneOf: [baseSchema, { type: 'null' }] };
+        return { anyOf: [baseSchema, { type: 'null' }] };
     }
     return baseSchema;
 }
