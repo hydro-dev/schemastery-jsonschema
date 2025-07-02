@@ -15,6 +15,7 @@ function getBaseSchema(def: Schema, allowUnsafe): JSONSchema7 {
                 type: 'number',
                 maximum: def.meta?.max,
                 minimum: def.meta?.min,
+                multipleOf: def.meta?.step,
             };
         case 'boolean':
             return { type: 'boolean' };
@@ -49,8 +50,10 @@ function getBaseSchema(def: Schema, allowUnsafe): JSONSchema7 {
             return {
                 allOf: def.list?.map((inner) => ({ $ref: `#/definitions/${inner}` })),
             };
+        case 'transform':
+            return { $ref: `#/definitions/${def.inner}` };
         default: {
-            throw new Error('Not implemented');
+            throw new Error(`Not implemented: ${def.type}`);
         }
     }
 }
